@@ -153,7 +153,13 @@ fn main() -> Result<()> {
     let runtime = tokio::runtime::Builder::new_current_thread()
         .enable_all()
         .build()?;
-    let local_set = tokio::task::LocalSet::new();
 
-    runtime.block_on(local_set.run_until(app()))
+    runtime.block_on(async {
+        let local_set = tokio::task::LocalSet::new();
+
+        let result = local_set.run_until(app()).await;
+        local_set.await;
+
+        result
+    })
 }
